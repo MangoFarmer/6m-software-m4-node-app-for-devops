@@ -32,10 +32,10 @@ jobs:
       - docker/check
       - docker/build:
           image: mangofarmer/education-space
-          tag: 0.1.0
+          tag: 0.1.1
       - docker/push:
           image: mangofarmer/education-space
-          tag: 0.1.0
+          tag: 0.1.1
   deploy:
     docker:
         - image: cimg/node:16.10
