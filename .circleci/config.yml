@@ -31,10 +31,10 @@ jobs:
       - checkout
       - docker/check
       - docker/build:
-          image: MangoFarmer/education-space
+          image: mangofarmer/education-space
           tag: 0.1.0
       - docker/push:
-          image: MangoFarmer/education-space
+          image: mangofarmer/education-space
           tag: 0.1.0
   deploy:
     docker:
