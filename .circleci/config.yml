@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   docker: circleci/docker@2.1.4
-  heroku: circleci/heroku@2.0.0
+  snyk: snyk/snyk@1.5.0
 jobs:
   build:
     docker:
@@ -24,31 +24,18 @@ jobs:
       - run: |
           echo "Running tests..."
           npm run test
-  build-and-push:
-    executor: docker/docker
-    steps:
-      - setup_remote_docker
-      - checkout
-      - docker/check
-      - docker/build:
-          image: mangofarmer/education-space
-          tag: 0.1.1
-      - docker/push:
-          image: mangofarmer/education-space
-          tag: 0.1.1
-  deploy:
+  scan:
     docker:
         - image: cimg/node:16.10
+    environment:
+        IMAGE_NAME: mangofarmer/education-space
     steps:
-        - setup_remote_docker      
-        - heroku/install
         - checkout
-        - run:
-            name: Heroku Container Push
-            command: | 
-                heroku container:login
-                heroku container:push web -a sudhakardevops
-                heroku container:release web -a sudhakardevops
+        - setup_remote_docker      
+        - docker/check
+        - run: docker build -t $IMAGE_NAME .
+        - snyk/scan: 
+            docker-image-name: $IMAGE_NAME
 
 workflows:
   simple_workflow:
@@ -57,9 +44,6 @@ workflows:
       - test:
           requires:
             - build
-      - build-and-push:
+      - scan:
           requires:
-            - test
-      - deploy:
-          requires:
-            - build-and-push
+            - build
